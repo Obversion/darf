@@ -1,0 +1,197 @@
+# Default configuration for DARF V4
+experiment:
+  name: "DARF"
+  version: "4.0.0"
+  description: "Domain-Aware Random Forest V4"
+  random_seed: 42
+
+visualization:
+  colors:
+    primary: "#3498db"
+    secondary: "#e74c3c"
+    tertiary: "#2ecc71"
+    improvement: "#27ae60"
+    degradation: "#e74c3c"
+    target_node: "#e74c3c"
+    root_node: "#3498db"
+    intermediate_node: "#2ecc71"
+    background: "#ffffff"
+    grid: "#f0f0f0"
+  fonts:
+    title_size: 14
+    subtitle_size: 12
+    axis_label_size: 11
+    legend_size: 10
+  styles:
+    plot_theme: "darkgrid"
+    figure_dpi: 150
+    save_format: "svg"
+  labels:
+    rf: "Random Forest"
+    dwrf: "DARF"
+    xgb: "XGBoost"
+    rf_baseline: "RF"
+    dwrf_vs_rf: "DARF vs RF"
+    dwrf_vs_xgb: "DARF vs XGBoost"
+
+problem:
+  type: "regression" # classification will be added in future
+  num_classes: null
+
+dataset:
+  path: "C:/path/data.csv"
+  datetime_column: null
+  forecast_horizon: 48
+  train_ratio: 0.70
+  val_ratio: 0.15
+  test_ratio: 0.15
+  missing_strategy: "drop"
+  missing_fill_value: 0
+  cv_type: "chronological" # or "blocked" or "rolling"
+  n_folds: 5
+  test_window: 24
+  step_size: 12
+
+features:
+  columns:
+    - "GHI"
+    - "Ambient_Temp"
+    - "Panel_Temp"
+    - "Wind_Speed"
+    - "Humidity"
+    - "Pressure"
+    - "SunShine"
+    - "Hour"
+    - "Month"
+  target: "DC_Power"
+  lags: []
+  # cyclical_features:
+  #   - "Hour"
+  #   - "Month"
+
+graphs:
+  # Graph 1: Full Expert Graph (causal edges: cause -> effect)
+  graph_1:
+    name: "Experimental Graph"
+    description: "Complete causal graph based on domain knowledge"
+    edges:
+      GHI: ["DC_Power", "Panel_Temp"]                    # GHI influences PV power and panel temp
+      Ambient_Temp: ["Panel_Temp", "Humidity"]           # Ambient temp influences panel temp and humidity
+      Panel_Temp: ["DC_Power"]                           # Panel temp directly affects PV power
+      Wind_Speed: ["Ambient_Temp", "Humidity"]           # Wind affects ambient temp and humidity
+      Hour: ["GHI", "Ambient_Temp"]                      # Hour affects irradiance and ambient temp
+      Month: ["GHI"]                                     # Month affects irradiance
+      SunShine: ["DC_Power"]                             # Sunshine directly affects PV power
+      Pressure: []                                       # Root (no parents)
+      Humidity: ["DC_Power"]                             # Humidity affects PV power (if considered)
+
+  # Graph 2: Simplified Physical Graph
+  graph_2:
+    name: "Simplified Physical Graph"
+    description: "Reduced graph for sensitivity analysis"
+    edges:
+      GHI: ["DC_Power", "Panel_Temp"]
+      Ambient_Temp: ["Panel_Temp", "Humidity"]
+      Panel_Temp: ["DC_Power"]
+      Wind_Speed: ["Ambient_Temp"]
+      Hour: ["GHI", "Ambient_Temp"]
+      Month: ["GHI"]
+      Humidity: ["DC_Power"]
+
+  # Graph 3: Minimal Graph (only direct causes of PV power)
+  graph_3:
+    name: "Fully Physical Graph"
+    description: "Only direct causes of PV power"
+    edges:
+      GHI: ["DC_Power", "Panel_Temp"]
+      Panel_Temp: ["DC_Power"]
+      Ambient_Temp: ["DC_Power", "Panel_Temp", "Humidity"]
+      Wind_Speed: ["DC_Power", "Panel_Temp", "Ambient_Temp", "Humidity"]
+      Humidity: ["DC_Power"]
+      Hour: ["Ambient_Temp"]
+      Month: ["Ambient_Temp", "Humidity"]
+
+ridge:
+  alpha: 0.001 # <-- This is the lambda/regularization parameter
+  fit_intercept: true
+  normalize: false
+  lambda_sensitivity:
+    enabled: true
+    values: [0.01, 0.05, 0.1, 0.5, 1.0, 2.0, 5.0, 7.0, 10.0]
+
+domain_prior:
+  min_intrinsic_influence: 0.01
+  use_r_squared_intrinsic: true
+  fixed_intrinsic_influence: 0.3
+
+sampling:
+  smoothing_alpha: 0.3  # <-- This is the smoothing Alpha parameter
+  min_sampling_prob: 0.01
+  alpha_sensitivity:
+    enabled: true
+    values: [0.01, 0.05, 0.1, 0.2, 0.3, 0.4, 0.5, 0.7, 1.0]
+
+algorithm:
+  experiment_type: "comparison"
+  bagging:
+    enabled: true
+    n_estimators: 420
+    max_depth: 14
+    min_samples_split: 5
+    min_samples_leaf: 3
+    max_features: "sqrt"
+    n_jobs: -1
+    class_weight: null
+  boosting:
+    enabled: false
+    n_estimators: 420
+    max_depth: 6
+    learning_rate: 0.1
+    subsample: 0.8
+    colsample_bytree: 0.8
+    min_child_weight: 1
+    gamma: 0
+    reg_alpha: 0
+    reg_lambda: 1
+    n_jobs: -1
+    objective: "reg:squarederror"
+    eval_metric: "rmse"
+    early_stopping_rounds: 10
+
+evaluation:
+  n_runs: 70
+  random_seed_base: 42
+  significance_level: 0.05
+  correction_method: "none"
+  mape_threshold: 5.1 # physical units of the target variable
+  regression_metrics: ["MAE", "RMSE", "MAPE", "R2"]
+  classification_metrics: ["accuracy", "f1_macro", "precision_macro", "recall_macro", "auc_roc"]
+  temporal:
+    enabled: true
+    time_buckets:
+      morning: [6, 10]
+      noon: [10, 14]
+      afternoon: [14, 18]
+
+export:
+  enabled: false
+  format: "onnx"
+  output_dir: "./models"
+  onnx:
+    opset_version: 14
+    target_platform: "mlnet"
+
+output:
+  dir: "./dwrf_output"
+  save_plots: true
+  save_models: true
+  save_predictions: true
+  save_config: true
+  save_sensitivity_results: true
+  save_temporal_results: true
+
+logging:
+  level: "INFO"
+  log_file: "dwrf_run.log"
+  console_output: true
+  verbose_metrics: true
