@@ -159,7 +159,7 @@ algorithm:
     early_stopping_rounds: 10
 
 evaluation:
-  n_runs: 70
+  n_runs: 60
   random_seed_base: 42
   significance_level: 0.05
   correction_method: "none"
