@@ -8,17 +8,16 @@ DARF supports both **Random Forest (bagging) and is designed for reproducible ex
 
 ### Key Features
 
-* Regression and classification
-* Random Forest and XGBoost ensemble models
+* Regression
+* Random Forest and XGBoost ensemble model Baselines
 * Up to **3 expert knowledge graphs** for sensitivity analysis
 * Domain Prior Weights (DPW) estimated using Ridge Regression and dynamic programming
 * Sensitivity analysis for smoothing parameter **α** and Ridge penalty **λ**
 * Repeated experiments with configurable random seeds
 * Statistical significance testing, effect sizes, and multiple-testing correction
 * Temporal performance analysis, including time-of-day evaluation
-* Publication-quality SVG visualisations
-* ONNX model export for deployment, including **ML.NET**
-* Configurable chronological, blocked, and rolling cross-validation
+* SVG visualisations
+* Chronological cross-validation
 * Automatic saving of models, predictions, results, configurations, and analysis outputs
 
 ---
@@ -64,7 +63,6 @@ The main configuration sections are:
 | `sampling`      | Feature-sampling and α sensitivity settings                   |
 | `algorithm`     | Random Forest and XGBoost configuration                       |
 | `evaluation`    | Metrics, statistical tests, and temporal analysis             |
-| `export`        | ONNX export configuration                                     |
 | `output`        | Output directories and files                                  |
 | `logging`       | Logging level and output settings                             |
 
