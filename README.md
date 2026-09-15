@@ -4,7 +4,7 @@
 
 **DARF (Domain-Aware Random Forest)** is a Python framework for integrating domain knowledge into ensemble machine learning models through a graph-based prior weighting mechanism.
 
-DARF supports both **Random Forest (bagging) and is designed for reproducible experimentation, sensitivity analysis, statistical evaluation, and model deployment.
+DARF supports Random Forest (bagging) and is designed for reproducible experimentation, sensitivity analysis, statistical evaluation, and model deployment.
 
 ### Key Features
 
