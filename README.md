@@ -54,7 +54,7 @@ The main configuration sections are:
 | --------------- | ------------------------------------------------------------- |
 | `experiment`    | Experiment metadata and random seeds                          |
 | `visualization` | Plot colours, fonts, styles, and output format                |
-| `problem`       | Regression or classification settings                         |
+| `problem`       | Regression settings                         |
 | `dataset`       | Dataset path, splitting, missing values, and cross-validation |
 | `features`      | Input features, target, lags, and cyclical features           |
 | `graphs`        | Expert domain-knowledge graphs                                |
@@ -92,7 +92,6 @@ dataset:
   val_ratio: 0.15
   test_ratio: 0.15
   cv_type: "chronological"
-  n_folds: 5
 ```
 
 ### Domain Knowledge Graphs
@@ -163,7 +162,6 @@ Random Forest with configurable:
 * Maximum depth
 * Minimum samples per split/leaf
 * Feature sampling
-* Class weighting
 * Parallel processing
 
 ### Boosting
@@ -274,8 +272,6 @@ Results are stored under the configured output directory:
 darf_output/
 ├── plots/
 │   └── *.svg
-├── models/
-│   └── *.onnx / *.pkl
 ├── predictions/
 │   └── *.csv
 ├── results_summary.json
@@ -284,7 +280,7 @@ darf_output/
 
 Depending on the configuration, DARF can produce:
 
-* **15+ plots**
+* **10+ plots**
 * Aggregated experiment results
 * Sensitivity analysis results
 * Temporal analysis results
@@ -295,16 +291,6 @@ Depending on the configuration, DARF can produce:
 ---
 
 ## Customisation
-
-### Visualisation
-
-Modify the `visualization` section to customise:
-
-* Colours
-* Fonts
-* Figure resolution
-* Plot themes
-* Output formats
 
 ### Expert Knowledge
 
