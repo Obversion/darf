@@ -1,4 +1,4 @@
-# DARF V4 – Domain-Aware Random Forest Framework
+# DARF V4 – Domain-Aware Random Forest
 
 ## Overview
 
